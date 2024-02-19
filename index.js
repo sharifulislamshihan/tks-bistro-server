@@ -61,6 +61,18 @@ async function run() {
             })
         }
 
+        // use verify admin after verify token
+        const verifyAdmin = async(req, res, next) =>{
+            const email = req.decoded.email;
+            const query = {email: email};
+            const user = await userCollection.findOne(query);
+            const isAdmin = user?.role === 'admin';
+            if(!isAdmin){
+                return res.status(403).send({message: 'forbidden access'});
+            }
+            next();
+        }
+
         // getting info about menu (find)
         app.get('/menu', async (req, res) => {
             const result = await menuCollection.find().toArray();
@@ -68,13 +80,13 @@ async function run() {
         })
 
         // user related API
-        app.get('/users', verifyToken, async (req, res) => {
+        app.get('/users', verifyToken, verifyAdmin,  async (req, res) => {
             console.log(req.headers);
             const result = await userCollection.find().toArray();
             res.send(result);
         })
 
-        // chekcing the user if its is admin or not
+        // checkcing the user if its is admin or not
         app.get('/user/admin/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             if (email !== req.decoded.email) {
