@@ -78,14 +78,54 @@ async function run() {
             const result = await menuCollection.find().toArray();
             res.send(result);
         })
+        // to see specific id
+        app.get('/menu/:id' , async( req, res ) => {
+            const id = req.params.id;
+            //console.log(id);
+            const query = {_id: new ObjectId(id)}
+            const result = await menuCollection.findOne(query);
+            //console.log(result);
+            res.send(result);
+        })
 
-        // TODO: only admin can add menu in the collection
+        // DOne: only admin can add menu in the collection
         // added item in the menu collection
         app.post('/menu',verifyToken, verifyAdmin, async(req, res) =>{
             const item  = req.body;
             const result = await menuCollection.insertOne(item);
             res.send(result);
         })
+
+        // to update menu item
+        app.patch('/menu/:id', async(req,res) =>{
+            const item = req.body;
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set:{
+                    name: item.name,
+                    category:  item.category,
+                    price: item.price,
+                    recipe: item.recipe,
+                    image: item.image
+                }
+            }
+
+            const result = await menuCollection.updateOne(filter,updatedDoc);
+            res.send(result);
+        })
+
+
+        
+
+        // delete menu from database
+        app.delete('/menu/:id', verifyToken, verifyAdmin, async(req, res)=>{
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await menuCollection.deleteOne(query);
+            res.send(result);
+        })
+
 
         // user related API
         app.get('/users', verifyToken, verifyAdmin,  async (req, res) => {
