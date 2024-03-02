@@ -134,7 +134,7 @@ async function run() {
             res.send(result);
         })
 
-        // checkcing the user if its is admin or not
+        // checking the user if its is admin or not
         app.get('/user/admin/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             if (email !== req.decoded.email) {
@@ -212,6 +212,19 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await cartCollection.deleteOne(query);
             res.send(result);
+        })
+
+
+        // state and analytics
+        app.get('/admin-stats', verifyToken, verifyAdmin, async(req, res) =>{
+            const users = await userCollection.estimatedDocumentCount() ;
+            const menuItem = await menuCollection.estimatedDocumentCount();
+
+
+            res.send({
+                users,
+                menuItem,
+            })
         })
 
         // Send a ping to confirm a successful connection
