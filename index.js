@@ -216,14 +216,13 @@ async function run() {
 
 
         // state and analytics
-        app.get('/admin-stats', verifyToken, verifyAdmin, async(req, res) =>{
-            const users = await userCollection.estimatedDocumentCount() ;
+        app.get('/admin-stats', verifyToken, verifyAdmin, async( req, res ) =>{
+            const users = await userCollection.estimatedDocumentCount();
             const menuItem = await menuCollection.estimatedDocumentCount();
-
-
+            
             res.send({
                 users,
-                menuItem,
+                menuItem
             })
         })
 
